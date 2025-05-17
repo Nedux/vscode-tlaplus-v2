@@ -16,7 +16,11 @@ This extension adds support for the [TLA<sup>+</sup> formal specification langua
 - Code on-type formatting.
 - Powered by the [official TLA<sup>+</sup> tools](https://github.com/tlaplus/tlaplus).
 
-<img src="https://raw.githubusercontent.com/tlaplus/vscode-tlaplus/master/resources/images/screencast.gif" width="800" height="auto">
+<img 
+  src="https://raw.githubusercontent.com/tlaplus/vscode-tlaplus/master/resources/images/screencast.gif" 
+  width="800" 
+  height="auto"
+  alt="Animated screencast of TLA+ extension in Visual Studio Code showing syntax highlighting and model checking" >
 
 ## Documentation
 
