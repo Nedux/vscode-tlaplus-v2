@@ -305,6 +305,11 @@
                 "command": "tlaplus.tlaps.check-step",
                 "title": "Check proof step in TLAPS",
                 "category": "TLA+"
+            },
+            {
+              "command": "tlaplus.navigateToFileContents",
+              "title": "Navigate to file contents",
+              "category": "TLA+"
             }
         ],
         "snippets": [

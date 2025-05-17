@@ -32,6 +32,7 @@ import { moduleSearchPaths } from './paths';
 import { ModuleSearchPathsTreeDataProvider } from './panels/moduleSearchPathsTreeDataProvider';
 import { CheckModuleTool, SmokeModuleTool } from './lm/TLCTool';
 import { ParseModuleTool, SymbolProviderTool } from './lm/SANYTool';
+import { navigateToFileContents, TLAPLUS_SHOW_FILE_CONTENT_PICKER } from './navigation/navigateToFileContents';
 
 const TLAPLUS_FILE_SELECTOR: vscode.DocumentSelector = { scheme: 'file', language: LANG_TLAPLUS };
 const TLAPLUS_CFG_FILE_SELECTOR: vscode.DocumentSelector = { scheme: 'file', language: LANG_TLAPLUS_CFG };
@@ -144,6 +145,9 @@ export function activate(context: vscode.ExtensionContext): void {
             TLAPLUS_DEBUG_LAUNCH_DEBUG,
             (uri) => attachDebugger()
         ),
+        vscode.commands.registerCommand(
+            TLAPLUS_SHOW_FILE_CONTENT_PICKER,
+            () => navigateToFileContents(tlaDocInfos)),
         vscode.languages.registerEvaluatableExpressionProvider(
             TLAPLUS_FILE_SELECTOR, {
             // https://github.com/microsoft/vscode/issues/89084
