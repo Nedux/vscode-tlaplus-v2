@@ -28,21 +28,35 @@ export const TLA_STD_MODULES = [
 ];
 
 const TLA_STARTING_KEYWORD_ITEMS = TLA_STARTING_KEYWORDS.map(w => {
-    return new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    const item = new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    item.detail = '(keyword) TLA+ block start';
+    return item;
 });
 const TLA_PROOF_STARTING_KEYWORD_ITEMS = TLA_PROOF_STARTING_KEYWORDS.map(w => {
-    return new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    const item = new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    item.detail = '(keyword) TLA+ proof';
+    return item;
 });
 const TLA_OTHER_KEYWORD_ITEMS = TLA_OTHER_KEYWORDS.map(w => {
-    return new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    const item = new vscode.CompletionItem(w, vscode.CompletionItemKind.Keyword);
+    item.detail = '(keyword) TLA+';
+    return item;
 });
-const TLA_CONST_ITEMS = TLA_CONSTANTS.map(w => new vscode.CompletionItem(w, vscode.CompletionItemKind.Constant));
+const TLA_CONST_ITEMS = TLA_CONSTANTS.map(w => {
+    const item = new vscode.CompletionItem(w, vscode.CompletionItemKind.Constant);
+    item.detail = '(constant) TLA+';
+    return item;
+});
 const TLA_OPERATOR_ITEMS = TLA_OPERATORS.map(w => {
-    return new vscode.CompletionItem('\\' + w, vscode.CompletionItemKind.Operator);
+    const item =new vscode.CompletionItem('\\' + w, vscode.CompletionItemKind.Operator);
+    item.detail = '(operator) TLA+';
+    return item;
 });
 const TLA_INNER_ITEMS = TLA_OTHER_KEYWORD_ITEMS.concat(TLA_CONST_ITEMS);
 const TLA_STD_MODULE_ITEMS = TLA_STD_MODULES.map(m => {
-    return new vscode.CompletionItem(m, vscode.CompletionItemKind.Module);
+    const item = new vscode.CompletionItem(m, vscode.CompletionItemKind.Module);
+    item.detail = '(module) TLA+';
+    return item;
 });
 
 /**
@@ -72,7 +86,26 @@ export class TlaCompletionItemProvider implements vscode.CompletionItemProvider 
         }
         const docInfo = this.docInfos.get(document.uri);
         const symbols = docInfo.symbols || [];
-        const symbolInfos = symbols.map(s => new vscode.CompletionItem(s.name, mapKind(s.kind)));
+        const symbolInfos = symbols.map(s => {
+            let kindLabel = '';
+            switch (s.kind) {
+                case vscode.SymbolKind.Variable:
+                    kindLabel = 'variable';
+                    break;
+                case vscode.SymbolKind.Function:
+                    kindLabel = 'function';
+                    break;
+                case vscode.SymbolKind.Boolean:
+                case vscode.SymbolKind.Constant:
+                    kindLabel = 'theorem';
+                    break;
+                default:
+                    kindLabel = 'symbol';
+            }
+            const item = new vscode.CompletionItem(s.name, mapKind(s.kind));
+            item.detail = `(${kindLabel}) User defined TLA+`;
+            return item;
+        });
         let items = TLA_INNER_ITEMS.concat(symbolInfos);
         if (!docInfo.isPlusCalAt(position)) {
             const isProofStep = /^\s*<\d+>[<>\d.a-zA-Z]*\s+[a-zA-Z]*$/g.test(prevText);
