@@ -21,7 +21,7 @@ import {
     TransportKind,
     VersionedTextDocumentIdentifier
 } from 'vscode-languageclient/node';
-import { TlapsProofStepDetails } from './model/tlaps';
+import { TlapsProofFinish, TlapsProofStepDetails } from './model/tlaps';
 import { DelayedFn } from './common';
 import {
     InitRequestInItializationOptions,
@@ -100,17 +100,25 @@ export class TlapsClient {
             'tlaplus.tlaps.check-step',
             (te, ed, args) => {
                 if (!this.client) {
+                    vscode.window.showWarningMessage('TLAPM client is not found');
                     return;
                 }
+
+                const lang = te.document.languageId;
+                if (lang !== 'tlaplus') {
+                    vscode.window.showWarningMessage('This command only works in TLA+ files');
+                    return;
+                }
+
                 vscode.commands.executeCommand('tlaplus.tlaps.check-step.lsp',
-                    {
-                        uri: te.document.uri.toString(),
-                        version: te.document.version
-                    } as VersionedTextDocumentIdentifier,
-                    {
-                        start: te.selection.start,
-                        end: te.selection.end
-                    } as Range,
+                  {
+                      uri: te.document.uri.toString(),
+                      version: te.document.version
+                  } as VersionedTextDocumentIdentifier,
+                  {
+                      start: te.selection.start,
+                      end: te.selection.end
+                  } as Range,
                 );
             }
         ));
@@ -211,6 +219,22 @@ export class TlapsClient {
         this.context.subscriptions.push(this.client.onNotification(
             'tlaplus/tlaps/currentProofStep',
             this.currentProofStepDetailsListener
+        ));
+        this.context.subscriptions.push(this.client.onNotification(
+            'tlaplus/tlaps/proofFinished',
+            (params: TlapsProofFinish) => {
+                switch (params.status) {
+                    case 'success':
+                        vscode.window.showInformationMessage(`Check proof step: ${params.reason}`);
+                        return;
+                    case 'failure':
+                        vscode.window.showErrorMessage(`Check proof step: ${params.reason}`);
+                        return;
+                    case 'skipped':
+                        vscode.window.showWarningMessage(`Check proof step: ${params.reason}`);
+                        return;
+                }
+            }
         ));
         this.context.subscriptions.push(this.client.onDidChangeState((e: StateChangeEvent) => {
             if (e.oldState !== State.Running && e.newState === State.Running && this.client) {

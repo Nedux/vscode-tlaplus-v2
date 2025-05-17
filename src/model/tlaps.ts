@@ -32,3 +32,8 @@ export interface TlapsProofStepDetails {
     obligations: TlapsProofObligationState[];
     sub_count: CountByStepStatus;
 }
+
+export interface TlapsProofFinish {
+  status: 'success' | 'failure' | 'skipped';
+  reason: string;
+}
